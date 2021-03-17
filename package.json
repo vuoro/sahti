@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vuoro/sahti.git"
+    "url": "git+https://github.com/vuoro/sahti.git"
   },
   "keywords": [
     "webgl2",
@@ -49,7 +49,7 @@
   "author": "Joni Korpi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Vuoro/sahti/issues"
+    "url": "https://github.com/vuoro/sahti/issues"
   },
-  "homepage": "https://github.com/Vuoro/sahti#readme"
+  "homepage": "https://github.com/vuoro/sahti#readme"
 }
