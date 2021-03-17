@@ -158,3 +158,5 @@ If you have created multiple components, but would like them to be rendered in a
 component({order: 1, …})
 component({order: 0, …})
 ```
+
+You can start creating components, mounting instances, and updating context resources at any time: no need to wait for a `<canvas>` to initialize a WebGL context. Once a context becomes available, all context and instance updates will be "played back" in sequence. This also means Sahti can take a WebGL context loss and restoration without stopping the entire app.
