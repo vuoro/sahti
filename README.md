@@ -111,7 +111,7 @@ getContext(triangle).update(new Float32Array(9));
 getContext(world).update("time", Date.now());
 ```
 
-`props` contains examples of the kind of data your components will be able to take in. Each of these will become an instanced buffer, automatically updated as your components mount and update.
+`props` contains examples of the kind of data your components will be able to take in. Each of these will become an instanced attribute buffer, automatically updated as your components mount and update.
 
 ```js
 const Example = component({props: { position: [0, 0] }, …});
