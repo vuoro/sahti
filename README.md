@@ -2,7 +2,7 @@
 
 **Write a WebGL 2 command, use it like a component.**
 
-Sahti lets you combine the power of WebGL 2 shaders with the familiar API of front-end component libraries.
+Sahti lets you combine the power of WebGL 2 shaders with the familiar API of front-end component frameworks.
 
 ## Supported frameworks or component types
 
@@ -11,6 +11,8 @@ Sahti lets you combine the power of WebGL 2 shaders with the familiar API of fro
 - 🚫 Web Components (soon)
 
 ## Minimal React example https://vuoro.github.io/sahti/
+
+Note: WebGL 2 is currently not supported by default in Safari. You need to turn it on via `Develop -> Experimental Features`.
 
 ```js
 import { Canvas, component } from "@sahti/react";
