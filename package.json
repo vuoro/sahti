@@ -1,7 +1,7 @@
 {
   "name": "@vuoro/sahti",
   "version": "0.0.1",
-  "description": "Components API for instanced rendering in WebGL 2",
+  "description": "Write a WebGL 2 command, use it like a component.",
   "main": "main.js",
   "type": "module",
   "exports": {
