@@ -2,8 +2,11 @@
   "name": "@vuoro/sahti",
   "version": "0.0.1",
   "description": "Write a WebGL 2 command, use it like a component.",
-  "main": "main.js",
   "type": "module",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "main": "main.js",
   "exports": {
     ".": "./main.js",
     "./react": "./main.react.js"
