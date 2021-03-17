@@ -6,8 +6,8 @@ Sahti lets you combine the power of WebGL 2 shaders with the familiar API of fro
 
 ## Supported frameworks or component types
 
-- ✅ React (documentation WIP)
-- ✅ Custom (documentation WIP)
+- ✅ React (documentation WIP) `@vuoro/sahti/react`
+- ✅ Custom (documentation WIP) `@vuoro/sahti`
 - 🚫 Web Components (soon)
 
 ## Minimal React example https://vuoro.github.io/sahti/
