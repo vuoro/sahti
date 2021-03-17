@@ -17,11 +17,7 @@ Note: WebGL 2 is currently not supported by default in Safari. You need to turn 
 ```js
 import { Canvas, component } from "@sahti/react";
 
-const triangle = [
-  [-1, -1, 0],
-  [1, -1, 0],
-  [-1, 1, 0],
-];
+const triangle = [[-1, -1, 0], [1, -1, 0], [-1, 1, 0]];
 
 const RedTriangle = component({
   context: { triangle },
@@ -33,23 +29,20 @@ const RedTriangle = component({
   `,
   fragment: `
     out vec4 pixelColor;
-
     void main() {
       pixelColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
   `,
 });
 
-const App = () => {
-  return (
-    <>
-      <RedTriangle />
-      <RedTriangle position={[2, 0, 0]} />
-      <RedTriangle position={[-2, 0, 0]} />
-      <Canvas width={320} height={320} />
-    </>
-  );
-};
+const App = () => (
+  <>
+    <RedTriangle />
+    <RedTriangle position={[2, 0, 0]} />
+    <RedTriangle position={[-2, 0, 0]} />
+    <Canvas width={320} height={320} />
+  </>
+);
 ```
 
 ## Technical summary
