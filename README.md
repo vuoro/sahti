@@ -12,6 +12,8 @@ Sahti lets you combine the power of WebGL 2 shaders with the familiar API of fro
 
 ## Minimal React example https://vuoro.github.io/sahti/
 
+Note: WebGL 2 is currently not supported by default in Safari. You need to turn it on via `Develop -> Experimental Features`.
+
 ```js
 import { Canvas, component } from "@sahti/react";
 
