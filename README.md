@@ -16,7 +16,9 @@ https://www.npmjs.com/package/@vuoro/sahti
 - ✅ Custom (documentation WIP) `import {component, createRenderer} from "@vuoro/sahti";`
 - 🚫 Web Components (soon)
 
-## Minimal React example https://vuoro.github.io/sahti/
+## Minimal React example 
+
+https://vuoro.github.io/sahti/
 
 Note: WebGL 2 is currently not supported by default in Safari. You need to turn it on via `Develop -> Experimental Features`.
 
