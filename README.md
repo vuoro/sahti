@@ -9,10 +9,10 @@ npm i @vuoro/sahti
 ```
 https://www.npmjs.com/package/@vuoro/sahti
 
-## Supported frameworks or component types
+## Supported frameworks
 
-- ✅ React (documentation WIP) `@vuoro/sahti/react`
-- ✅ Custom (documentation WIP) `@vuoro/sahti`
+- ✅ React (documentation WIP) `import {component, Canvas} from "@vuoro/sahti/react";`
+- ✅ Custom (documentation WIP) `import {component, createRenderer} from "@vuoro/sahti";`
 - 🚫 Web Components (soon)
 
 ## Minimal React example https://vuoro.github.io/sahti/
