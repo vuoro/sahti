@@ -4,7 +4,9 @@
 
 Sahti lets you combine the power of WebGL 2 shaders with the familiar API of front-end component frameworks. It's a library intended for people comfortable with writing custom GLSL shaders by hand.
 
-`npm i @vuoro/sahti`
+```
+npm i @vuoro/sahti
+```
 https://www.npmjs.com/package/@vuoro/sahti
 
 ## Supported frameworks or component types
