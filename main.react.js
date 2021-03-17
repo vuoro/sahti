@@ -1,10 +1,4 @@
-import {
-  createElement,
-  useRef,
-  useEffect,
-  useCallback,
-  forwardRef,
-} from "react";
+import { createElement, useRef, useEffect, useCallback, forwardRef } from "react";
 
 import {
   createRenderer,
@@ -25,11 +19,7 @@ export const Canvas = ({ attributes, pixelRatio, ...rest }) => {
   });
 };
 
-export const useCanvas = (
-  elementOrRef,
-  attributes = blankObject,
-  pixelRatio
-) => {
+export const useCanvas = (elementOrRef, attributes = blankObject, pixelRatio) => {
   useEffect(() => {
     const canvas = elementOrRef.current || elementOrRef;
     const renderer = createRenderer(canvas, attributes, pixelRatio);
@@ -37,12 +27,7 @@ export const useCanvas = (
     return () => {
       renderer.destroy();
     };
-  }, [
-    elementOrRef,
-    pixelRatio,
-    ...Object.keys(attributes),
-    ...Object.values(attributes),
-  ]);
+  }, [elementOrRef, pixelRatio, ...Object.keys(attributes), ...Object.values(attributes)]);
 };
 
 export const component = (...args) => {
@@ -74,10 +59,10 @@ export const useComponent = (component, props, enabled = true) => {
 
   const instance = ref.current;
 
-  const update = useCallback(
-    (name, value) => updateInstance(instance, name, value),
-    [instance, updateInstance]
-  );
+  const update = useCallback((name, value) => updateInstance(instance, name, value), [
+    instance,
+    updateInstance,
+  ]);
 
   // Update data from props
   for (const key in props) {

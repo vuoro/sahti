@@ -30,6 +30,9 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "prettier": {
+    "printWidth": 100
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vuoro/sahti.git"

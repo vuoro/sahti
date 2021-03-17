@@ -376,12 +376,7 @@ export const component = ({
   state.create = () => {
     const { gl, setProgram, setBuffer, setVao, setDepth, setCull } = renderer;
 
-    [
-      ...attributes,
-      ...instancedAttributes,
-      ...uniformBlocks,
-      ...textures,
-    ].forEach((context) => {
+    [...attributes, ...instancedAttributes, ...uniformBlocks, ...textures].forEach((context) => {
       if (!context.created) {
         context.create();
       }
@@ -479,11 +474,7 @@ export const component = ({
     setVao(vao);
 
     // Prepare attributes
-    for (
-      let i = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES) - 1;
-      i >= 0;
-      i--
-    ) {
+    for (let i = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES) - 1; i >= 0; i--) {
       const { name } = gl.getActiveAttrib(program, i);
       const location = gl.getAttribLocation(program, name);
       const context =
@@ -502,32 +493,18 @@ export const component = ({
 
       gl.enableVertexAttribArray(location);
       setBuffer(context.buffer);
-      gl.vertexAttribPointer(
-        location,
-        context.dimensions,
-        gl[context.bufferType],
-        false,
-        0,
-        0
-      );
+      gl.vertexAttribPointer(location, context.dimensions, gl[context.bufferType], false, 0, 0);
     }
 
     setVao();
 
     // Count vertices
     const count = attributes.length
-      ? attributes.reduce(
-          (count, context) => Math.min(count, context.count),
-          Infinity
-        )
+      ? attributes.reduce((count, context) => Math.min(count, context.count), Infinity)
       : overrideCount;
 
     // Prepare uniform blocks
-    for (
-      let i = gl.getProgramParameter(program, gl.ACTIVE_UNIFORM_BLOCKS) - 1;
-      i >= 0;
-      i--
-    ) {
+    for (let i = gl.getProgramParameter(program, gl.ACTIVE_UNIFORM_BLOCKS) - 1; i >= 0; i--) {
       const name = gl.getActiveUniformBlockName(program, i);
       const index = gl.getUniformBlockIndex(program, name);
 
@@ -544,14 +521,8 @@ export const component = ({
     // Prepare textures
     const totalUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
     const indexes = [...Array(totalUniforms).keys()];
-    const blockIndexes = gl.getActiveUniforms(
-      program,
-      indexes,
-      gl.UNIFORM_BLOCK_INDEX
-    );
-    const indexesOfNonBlockUniforms = indexes.filter(
-      (index) => blockIndexes[index] === -1
-    );
+    const blockIndexes = gl.getActiveUniforms(program, indexes, gl.UNIFORM_BLOCK_INDEX);
+    const indexesOfNonBlockUniforms = indexes.filter((index) => blockIndexes[index] === -1);
 
     for (const i of indexesOfNonBlockUniforms) {
       const { name } = gl.getActiveUniform(program, i);
@@ -570,12 +541,7 @@ export const component = ({
     // Handle instances
     const createInstances = () => {
       let isFirstBuffer = true;
-      for (const {
-        name,
-        refill,
-        dimensions,
-        BatchConstructor,
-      } of instancedAttributes) {
+      for (const { name, refill, dimensions, BatchConstructor } of instancedAttributes) {
         const batch = new BatchConstructor(dimensions * instances.size);
 
         for (const instance of instances) {
@@ -699,9 +665,7 @@ const createContext = (name, context, isInstanced) => {
     // buffer
     let buffer, usage;
 
-    const [bufferType, shaderType] = dataToTypes(
-      isInstanced ? context : context[0]
-    );
+    const [bufferType, shaderType] = dataToTypes(isInstanced ? context : context[0]);
     state.bufferType = bufferType;
     state.shaderType = shaderType;
     state.dimensions = (isInstanced ? context : context[0]).length || 1;
@@ -755,13 +719,7 @@ const createContext = (name, context, isInstanced) => {
       if (created) {
         const { gl, setBuffer } = renderer;
         setBuffer(buffer);
-        gl.bufferSubData(
-          gl.ARRAY_BUFFER,
-          dstByteOffset,
-          data,
-          srcOffset,
-          length
-        );
+        gl.bufferSubData(gl.ARRAY_BUFFER, dstByteOffset, data, srcOffset, length);
       } else {
         pendingUpdates.add([false, [data, dstByteOffset, srcOffset, length]]);
       }
@@ -777,9 +735,7 @@ const createContext = (name, context, isInstanced) => {
       const { gl, setBuffer } = renderer;
 
       state.bindIndex =
-        state.bindIndex === undefined
-          ? renderer.uniformBindIndexCounter++
-          : state.bindIndex;
+        state.bindIndex === undefined ? renderer.uniformBindIndexCounter++ : state.bindIndex;
 
       buffer = gl.createBuffer();
       setBuffer(buffer, gl.UNIFORM_BUFFER);
@@ -817,9 +773,7 @@ const createContext = (name, context, isInstanced) => {
 
       const allData = new Float32Array(elementCounter);
 
-      uniforms.forEach(({ data, elementOffset }) =>
-        allData.set(data, elementOffset)
-      );
+      uniforms.forEach(({ data, elementOffset }) => allData.set(data, elementOffset));
 
       gl.bufferData(gl.UNIFORM_BUFFER, allData, gl.DYNAMIC_DRAW);
 
@@ -838,13 +792,7 @@ const createContext = (name, context, isInstanced) => {
       if (created) {
         const { gl, setBuffer } = renderer;
         setBuffer(buffer, gl.UNIFORM_BUFFER);
-        gl.bufferSubData(
-          gl.UNIFORM_BUFFER,
-          offsets.get(key),
-          data,
-          0,
-          data.length
-        );
+        gl.bufferSubData(gl.UNIFORM_BUFFER, offsets.get(key), data, 0, data.length);
       } else {
         pendingUpdates.add([key, data]);
       }
@@ -880,8 +828,7 @@ const createContext = (name, context, isInstanced) => {
       const pixelsAreABuffer = !inputPixels || ArrayBuffer.isView(inputPixels);
       const width = pixelsAreABuffer && (inputWidth || 64);
       const height = pixelsAreABuffer && (inputHeight || 64);
-      const pixels =
-        context.pixels || new Float32Array(width * height * channels);
+      const pixels = context.pixels || new Float32Array(width * height * channels);
 
       state.shaderType = sampler;
       _level = level;
@@ -912,14 +859,7 @@ const createContext = (name, context, isInstanced) => {
           offset
         );
       } else {
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          level,
-          gl[internalFormat],
-          _format,
-          _type,
-          pixels
-        );
+        gl.texImage2D(gl.TEXTURE_2D, level, gl[internalFormat], _format, _type, pixels);
       }
 
       _TEXTURE_2D = gl.TEXTURE_2D;
@@ -1022,18 +962,12 @@ const dataToTypes = (data) => {
   }
 
   if (Array.isArray(data)) {
-    return [
-      "FLOAT",
-      data.length > 4 ? `mat${Math.sqrt(data.length)}` : `vec${data.length}`,
-    ];
+    return ["FLOAT", data.length > 4 ? `mat${Math.sqrt(data.length)}` : `vec${data.length}`];
   }
 
   switch (data.constructor.name) {
     case "Float32Array":
-      return [
-        "FLOAT",
-        data.length > 4 ? `mat${Math.sqrt(data.length)}` : `vec${data.length}`,
-      ];
+      return ["FLOAT", data.length > 4 ? `mat${Math.sqrt(data.length)}` : `vec${data.length}`];
     case "Int8Array":
       return ["BYTE", `ivec${data.length}`];
     case "Uint8Array":
@@ -1070,9 +1004,7 @@ const logError = (log, shader) => {
     let lineIndex = 1;
     for (const line of shader.split("\n")) {
       if (Math.abs(lineIndex - lineNumber) < 8) {
-        console[lineIndex === +lineNumber ? "warn" : "log"](
-          `${lineIndex} ${line}`
-        );
+        console[lineIndex === +lineNumber ? "warn" : "log"](`${lineIndex} ${line}`);
       }
       lineIndex++;
     }
