@@ -78,8 +78,8 @@ const RedTriangle = component({…});
 
 ```js
 const MyComponent = component({
-  context = { shape: [[0,0,0], [], []] },
-  props = { position: [0,0,0] },
+  context = {},
+  props = {},
   vertex,
   fragment,
   mode = "TRIANGLES",
@@ -107,7 +107,7 @@ You can also update the data in these context pieces at any time:
 
 ```js
 getContext(triangle).update(new Float32Array(9));
-getContext(uniforms).update("time", Date.now());
+getContext(world).update("time", Date.now());
 ```
 
 `props` contains examples of the kind of data your components will be able to take in. Each of these will become an instanced buffer, automatically updated as your components mount and update.
@@ -120,7 +120,7 @@ const Example = component({props: { position: [0, 0] }, …});
 <Example position={[1, 1]}/>
 ```
 
-`vertex` and `fragment` are the shaders you'll write. Sahti will automatically declare all the attributes, uniform blocks, and texture uniforms based on the `context` and/or `props` you provide.
+`vertex` and `fragment` are the shaders you'll write. Sahti will automatically insert all the attributes, uniform blocks, and texture uniforms based on the `context` and/or `props` you provide.
 
 It will also add the shader version and precision lines. (Optionally customizable with `shaderVersion`, `vertexPrecision`, `fragmentPrecision`.)
 
