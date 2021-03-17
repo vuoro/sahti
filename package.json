@@ -1,0 +1,47 @@
+{
+  "name": "@vuoro/sahti",
+  "version": "0.0.1",
+  "description": "Components API for instanced rendering in WebGL 2",
+  "main": "main.js",
+  "scripts": {
+    "start": "npx @web/dev-server --open --watch"
+  },
+  "peerDependencies": {
+    "react": ">= 16",
+    "react-dom": ">= 16"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.22.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.4.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vuoro/sahti.git"
+  },
+  "keywords": [
+    "webgl2",
+    "webgl",
+    "3D",
+    "instanced",
+    "rendering",
+    "components",
+    "react"
+  ],
+  "author": "Joni Korpi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vuoro/sahti/issues"
+  },
+  "homepage": "https://github.com/Vuoro/sahti#readme"
+}
