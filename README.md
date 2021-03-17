@@ -2,7 +2,9 @@
 
 **Write a WebGL 2 command, use it like a component.**
 
-Sahti lets you combine the power of WebGL 2 shaders with the familiar API of front-end component frameworks. It's a library intended for people comfortable with writing custom GLSL shaders by hand.
+Sahti lets you combine the power of WebGL 2 shaders with the familiar API of front-end component frameworks. 
+
+I built Sahti to help me build performant, battery-friendly WebGL games. It's a library intended for people comfortable with writing custom GLSL shaders by hand. I currently use it with React, but it should be able to support any front-end JS framework.
 
 ```
 npm install --save @vuoro/sahti
@@ -14,13 +16,11 @@ https://www.npmjs.com/package/@vuoro/sahti
 
 - ✅ React (documentation WIP) `import {component, Canvas} from "@vuoro/sahti/react";`
 - ✅ Custom (documentation WIP) `import {component, createRenderer} from "@vuoro/sahti";`
-- 🚫 Web Components (soon)
+- 🚫 Web Components (soon, hopefully)
 
 ## Minimal React example 
 
-https://vuoro.github.io/sahti/
-
-Note: WebGL 2 is currently not supported by default in Safari. You need to turn it on via `Develop -> Experimental Features`.
+Demo: https://vuoro.github.io/sahti/
 
 ```js
 import { Canvas, component } from "@vuoro/sahti/react";
