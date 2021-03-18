@@ -6,7 +6,8 @@
   "main": "main.js",
   "exports": {
     ".": "./main.js",
-    "./react": "./main.react.js"
+    "./react": "./main.react.js",
+    "./camera": "./camera.js"
   },
   "scripts": {
     "start": "npx @web/dev-server --open --watch"
@@ -51,5 +52,8 @@
   "bugs": {
     "url": "https://github.com/vuoro/sahti/issues"
   },
-  "homepage": "https://github.com/vuoro/sahti#readme"
+  "homepage": "https://github.com/vuoro/sahti#readme",
+  "dependencies": {
+    "gl-mat4-esm": "^1.1.4"
+  }
 }
