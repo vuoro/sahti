@@ -2,8 +2,8 @@ import { create, perspective, ortho, lookAt } from "gl-mat4-esm";
 import { getContext, resizeSubscribers, requestJob } from "./main.js";
 
 const createCamera = (props = {}) => {
-  let { fov = 30, near = 0.01, far = 10, zoom = 1 } = props;
-  const { includeInContext = ["projection", "view", "cameraPosition", "cameraTarget"] } = props;
+  let { fov, near = 0.01, far = 10, zoom = 1 } = props;
+  const { includePosition = true, includeTarget = true, includeUp = false } = props;
 
   let width = window.innerWidth;
   let height = window.innerHeight;
@@ -11,23 +11,18 @@ const createCamera = (props = {}) => {
 
   const projection = create();
   const view = create();
-  const position = Float32Array.of(0, 0, 1);
-  const target = Float32Array.of(0, 0, 0);
-  const up = Float32Array.of(0, 1, 0);
+  const position = Float32Array.from(props.position || [0, 0, 1]);
+  const target = Float32Array.from(props.target || [0, 0, 0]);
+  const up = Float32Array.from(props.up || [0, -1, 0]);
 
   const context = {
     projection,
     view,
-    cameraPosition: position,
-    cameraTarget: target,
-    cameraUp: up,
   };
 
-  for (const key in context) {
-    if (!includeInContext.includes(key)) {
-      delete context[key];
-    }
-  }
+  if (includePosition) context.cameraPosition = position;
+  if (includeTarget) context.cameraTarget = target;
+  if (includeUp) context.cameraUp = up;
 
   const { update: updateContext } = getContext(context);
 
@@ -54,6 +49,11 @@ const createCamera = (props = {}) => {
 
   const updateView = () => {
     lookAt(view, position, target, up);
+
+    if (includePosition) updateContext("cameraPosition", position);
+    if (includeTarget) updateContext("cameraTarget", target);
+    if (includeUp) updateContext("cameraUp", up);
+
     updateContext("view", view);
   };
 
