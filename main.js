@@ -923,28 +923,6 @@ export const getContext = (context) => {
   return contexts.get(context);
 };
 
-//   const framebuffer = ({ textures = blankArray }) => {
-//     const { gl, setTexture, setFramebuffer } = useWebGL2();
-//
-//     const framebuffer = useMemo(() => gl.createFramebuffer(), [gl]);
-//     useEffect(() => () => gl.deleteFramebuffer(framebuffer), [gl, framebuffer]);
-//
-//     useEffect(() => {
-//       setFramebuffer(framebuffer);
-//       let index = 0;
-//       for (const { attachment = gl[`COLOR_ATTACHMENT${index}`], name } of textures) {
-//         const texture = textures.get(name);
-//         if (texture) {
-//           setTexture(texture);
-//           gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
-//           index++;
-//         }
-//       }
-//     });
-//
-//     return framebuffer;
-//   };
-
 export const render = () => {
   for (const [, command] of commands) {
     command.render();
