@@ -74,8 +74,7 @@ const MyComponent = component({
   // See below for what you can put in these.
   context = {},
   props = {},
-  // Required.
-  // Your WebGL 2 shader strings. See below for details.
+  // Your WebGL 2 shader strings. Required. See below for details.
   vertex,
   fragment,
   // The `mode` parameter in `gl.drawArrays`
