@@ -541,6 +541,7 @@ export const component = ({
     // Handle instances
     const createInstances = () => {
       let isFirstBuffer = true;
+      offsets.clear();
       for (const { name, refill, dimensions, BatchConstructor } of instancedAttributes) {
         const batch = new BatchConstructor(dimensions * instances.size);
 
