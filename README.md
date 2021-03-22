@@ -98,7 +98,7 @@ const MyComponent = component({
 
 Returns an object with 3 methods for managing the instances of the draw call:
 
-```
+```js
 import { component } from "@vuoro/sahti";
 
 const { addInstance, deleteInstance, updateInstance } = component({…});
@@ -216,7 +216,7 @@ const App = () => {
 
 Does the same as `component` above, but in the form of a React hook.
 
-```
+```js
 import { component } from "@vuoro/sahti";
 import { useComponent } from "@vuoro/sahti/react";
 
@@ -234,7 +234,7 @@ Because every WebGL library needs its own, opinionated camera implementation. :)
 
 This module is completely optional to use, and will not be included in your JS if you don't use it.
 
-```
+```js
 import { component } from "@vuoro/sahti";
 import createCamera from "@vuoro/sahti/camera";
 
@@ -268,7 +268,6 @@ cameraObject.position[0] = 1;
 cameraObject.target[0] = 1;
 cameraObject.up.set([0, -1, 0]);
 cameraObject.update();
-
 ```
 
 ## Technical details
@@ -291,7 +290,7 @@ All created draw calls will be called on the next `requestAnimationFrame`, whene
 
 To use the same `requestAnimationFrame` loop as Sahti, you can use `useAnimationFrame` or `requestJob`. If you update any context pieces or instances with these, Sahti will call all draw calls at the end of the same frame.
 
-```
+```js
 import { useAnimationFrame, requestJob } from "@vuoro/sahti";
 
 // Called on every frame.
@@ -312,7 +311,7 @@ Sahti uses a `ResizeObserver` to respond to `<canvas>` dimension changes. Due to
 
 `@vuoro/sahti/react` (and any other upcoming variants) will also export everything from `@vuoro/sahti`. So both of these will work:
 
-```
+```js
 import { useAnimationFrame } from "@vuoro/sahti";
 import { useAnimationFrame } from "@vuoro/sahti/react";
 ```
