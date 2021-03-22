@@ -88,7 +88,6 @@ const MyComponent = component({
   cull = "BACK",
   vertexPrecision = "precision highp float;",
   fragmentPrecision = "precision highp float;",
-  shaderVersion = "#version 300 es",
   order
 })
 ```
@@ -129,7 +128,7 @@ const Example = component({props: { position: [0, 0] }, …});
 
 `vertex` and `fragment` are the shaders you'll write. Sahti will automatically insert all the attributes, uniform blocks, and texture uniforms based on the `context` and/or `props` you provide.
 
-It will also add the shader version and precision lines. (Optionally customizable with `shaderVersion`, `vertexPrecision`, `fragmentPrecision`.)
+It will also add the shader version and precision lines. (Optionally customizable with `vertexPrecision`, `fragmentPrecision`.)
 
 ```js
 component({

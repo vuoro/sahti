@@ -271,6 +271,7 @@ export const commands = new Map();
 
 const programCache = new Map();
 const shaderCache = new Map();
+const shaderVersion = "#version 300 es";
 
 export const component = ({
   context = blankObject,
@@ -282,7 +283,6 @@ export const component = ({
   cull = "BACK",
   vertexPrecision = "precision highp float;",
   fragmentPrecision = "precision highp float;",
-  shaderVersion = "#version 300 es",
   order = commands.size * 0.001,
   count: overrideCount,
   instanceCount: overrideInstanceCount,
