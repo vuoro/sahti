@@ -2,7 +2,7 @@ import { create, perspective, ortho, lookAt } from "gl-mat4-esm";
 import { getContext, resizeSubscribers, requestJob } from "./main.js";
 
 const createCamera = (props = {}) => {
-  let { fov, near = 0.01, far = 10, zoom = 1 } = props;
+  let { fov, near = 0.1, far = 1000, zoom = 1 } = props;
   const { includePosition = true, includeTarget = true, includeUp = false } = props;
 
   let width = window.innerWidth;
@@ -13,7 +13,7 @@ const createCamera = (props = {}) => {
   const view = create();
   const position = Float32Array.from(props.position || [0, 0, 1]);
   const target = Float32Array.from(props.target || [0, 0, 0]);
-  const up = Float32Array.from(props.up || [0, -1, 0]);
+  const up = Float32Array.from(props.up || [0, 1, 0]);
 
   const context = {
     projection,
