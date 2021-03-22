@@ -1,81 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sahti example</title>
+<style>
+  html {
+    background: black;
+    color: white;
+  }
 
-    <style>
-      html {
-        color: white;
-        background: black;
-      }
+  a {
+    color: inherit;
+  }
+</style>
 
-      a {
-        color: inherit;
-      }
+<h1>Sahti examples</h1>
 
-      canvas {
-        width: 100%;
-        height: 100vh;
-      }
-    </style>
+<a href="https://github.com/vuoro/sahti">https://github.com/vuoro/sahti</a>
 
-    <script defer src="https://unpkg.com/es-module-shims@0.10.1/dist/es-module-shims.js"></script>
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://cdn.skypack.dev/react",
-          "react-dom": "https://cdn.skypack.dev/react-dom"
-        }
-      }
-    </script>
-
-    <script type="module">
-      import { createElement, useEffect, Fragment } from "react";
-      import { render } from "react-dom";
-
-      import { Canvas, component } from "./main.react.js";
-
-      const triangle = [
-        [-1, -1, 0],
-        [1, -1, 0],
-        [-1, 1, 0],
-      ];
-
-      const RedTriangle = component({
-        context: { triangle },
-        props: { position: [0, 0, 0] },
-        vertex: `
-          void main() {
-            gl_Position = vec4((triangle + position) * 0.25, 1.0);
-          }
-        `,
-        fragment: `
-          out vec4 pixelColor;
-
-          void main() {
-            pixelColor = vec4(1.0, 0.0, 0.0, 1.0);
-          }
-        `,
-      });
-
-      const App = () => {
-        return createElement(Fragment, null, [
-          createElement(RedTriangle),
-          createElement(RedTriangle, { position: [2, 0, 0] }),
-          createElement(RedTriangle, { position: [-2, 0, 0] }),
-          createElement(Canvas),
-        ]);
-      };
-
-      render(createElement(App), document.getElementById("demo"));
-    </script>
-  </head>
-
-  <body>
-    <a href="https://github.com/vuoro/sahti">https://github.com/vuoro/sahti</a>
-    <p>Note for Safari users: WebGL 2 is currently not supported by default in Safari. You need to turn it on via `Develop -> Experimental Features`.</p>
-    <div id="demo"></div>
-  </body>
-</html>
+<ul>
+  <li><a href="./examples/minimal.react.html">Minimal React</a></li>
+  <li><a href="./examples/maximal.react.html">Maximal React</a></li>
+</ul>
