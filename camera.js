@@ -26,12 +26,13 @@ const createCamera = (props = {}) => {
     direction[1] = target[1] - position[1];
     direction[2] = target[2] - position[2];
 
-    const sum = direction[0] + direction[1] + direction[2];
-    const normal = Math.sqrt(sum);
+    const sum =
+      direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2];
+    const magnitude = Math.sqrt(sum);
 
-    direction[0] /= normal;
-    direction[1] /= normal;
-    direction[2] /= normal;
+    direction[0] /= magnitude;
+    direction[1] /= magnitude;
+    direction[2] /= magnitude;
   };
 
   const context = {
