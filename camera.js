@@ -3,7 +3,12 @@ import { getContext, resizeSubscribers, requestJob } from "./main.js";
 
 const createCamera = (props = {}) => {
   let { fov, near = 0.1, far = 1000, zoom = 1 } = props;
-  const { includePosition = true, includeTarget = true, includeUp = false } = props;
+  const {
+    includePosition = false,
+    includeTarget = false,
+    includeDirection = false,
+    includeUp = false,
+  } = props;
 
   let width = window.innerWidth;
   let height = window.innerHeight;
@@ -14,6 +19,20 @@ const createCamera = (props = {}) => {
   const position = Float32Array.from(props.position || [0, 0, 1]);
   const target = Float32Array.from(props.target || [0, 0, 0]);
   const up = Float32Array.from(props.up || [0, 1, 0]);
+  const direction = Float32Array.from([0, 0, -1]);
+
+  const calculateDirection = () => {
+    direction[0] = target[0] - position[0];
+    direction[1] = target[1] - position[1];
+    direction[2] = target[2] - position[2];
+
+    const sum = direction[0] + direction[1] + direction[2];
+    const normal = Math.sqrt(sum);
+
+    direction[0] /= normal;
+    direction[1] /= normal;
+    direction[2] /= normal;
+  };
 
   const context = {
     projection,
@@ -23,6 +42,7 @@ const createCamera = (props = {}) => {
   if (includePosition) context.cameraPosition = position;
   if (includeTarget) context.cameraTarget = target;
   if (includeUp) context.cameraUp = up;
+  if (includeDirection) context.cameraDirection = direction;
 
   const { update: updateContext } = getContext(context);
 
@@ -53,6 +73,11 @@ const createCamera = (props = {}) => {
     if (includePosition) updateContext("cameraPosition", position);
     if (includeTarget) updateContext("cameraTarget", target);
     if (includeUp) updateContext("cameraUp", up);
+
+    if (includeDirection) {
+      calculateDirection();
+      updateContext("cameraDirection", direction);
+    }
 
     updateContext("view", view);
   };
