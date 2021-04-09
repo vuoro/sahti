@@ -634,8 +634,10 @@ const sortCommands = () => {
   list.forEach(([key, value]) => commands.set(key, value));
 };
 
+let instancedBufferCounter = 0;
+
 const createContext = (name, context, isInstanced) => {
-  if (contexts.has(context)) {
+  if (!isInstanced && contexts.has(context)) {
     const result = getContext(context);
 
     if (!result.created && context.gl) {
@@ -921,7 +923,7 @@ const createContext = (name, context, isInstanced) => {
     created = false;
   };
 
-  contexts.set(context, state);
+  contexts.set(isInstanced ? "instancedBuffer-" + instancedBufferCounter++ : context, state);
 
   if (context.gl) {
     state.create();
