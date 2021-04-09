@@ -710,6 +710,8 @@ const createContext = (name, context, isInstanced) => {
         }
         pendingUpdates.clear();
       }
+
+      if (renderer.debug) console.log("Created context buffer", context, state);
     };
 
     state.refill = (data) => {
@@ -795,6 +797,8 @@ const createContext = (name, context, isInstanced) => {
         }
         pendingUpdates.clear();
       }
+
+      if (renderer.debug) console.log("Created context uniform block", context, state);
     };
 
     state.update = (key, data) => {
@@ -883,7 +887,7 @@ const createContext = (name, context, isInstanced) => {
         pendingUpdates.clear();
       }
 
-      if (renderer.debug) console.log("Created context piece", context, state);
+      if (renderer.debug) console.log("Created context texture", context, state);
     };
 
     state.update = (data, x = 0, y = 0, width = 1, height = 1, dataOffset) => {
