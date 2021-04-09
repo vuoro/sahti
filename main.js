@@ -433,7 +433,7 @@ export const component = (input) => {
       fragment,
     ].join("\n");
 
-    if (debug) console.log("Creating command", input, finalVertex, finalFragment);
+    if (debug) console.log("Creating command", input, { finalVertex, finalFragment });
 
     const programKey = finalVertex + finalFragment;
 
