@@ -154,7 +154,7 @@
               position: [(index % 5) - 2, -Math.floor(index / 5), 0],
             })
           ),
-          createElement(Canvas),
+          createElement(Canvas, { debug: true }),
           createElement(
             "button",
             { type: "button", onClick: () => setCount((count) => count + 10) },

@@ -10,24 +10,24 @@ export * from "./main.js";
 
 const blankObject = {};
 
-export const Canvas = ({ attributes, pixelRatio, ...rest }) => {
+export const Canvas = ({ attributes, pixelRatio, debug = false, ...rest }) => {
   const ref = useRef();
-  useCanvas(ref, attributes, pixelRatio);
+  useCanvas(ref, attributes, pixelRatio, debug);
   return createElement("canvas", {
     ref,
     ...rest,
   });
 };
 
-export const useCanvas = (elementOrRef, attributes = blankObject, pixelRatio) => {
+export const useCanvas = (elementOrRef, attributes = blankObject, pixelRatio, debug = false) => {
   useEffect(() => {
     const canvas = elementOrRef.current || elementOrRef;
-    const renderer = createRenderer(canvas, attributes, pixelRatio);
+    const renderer = createRenderer(canvas, attributes, pixelRatio, debug);
 
     return () => {
       renderer.destroy();
     };
-  }, [elementOrRef, pixelRatio, ...Object.keys(attributes), ...Object.values(attributes)]);
+  }, [elementOrRef, pixelRatio, debug, ...Object.keys(attributes), ...Object.values(attributes)]);
 };
 
 export const component = (...args) => {

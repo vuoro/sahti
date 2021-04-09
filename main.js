@@ -97,7 +97,8 @@ const requestRendering = () => {
 export const createRenderer = (
   canvas,
   attributes = blankObject,
-  pixelRatio = typeof window ? window.devicePixelRatio : 1
+  pixelRatio = typeof window ? window.devicePixelRatio : 1,
+  debug = false
 ) => {
   let gl = canvas.getContext("webgl2", { ...defaultAttributes, ...attributes });
 
@@ -222,8 +223,10 @@ export const createRenderer = (
   renderer.clear = clear;
   renderer.observer = observer;
   renderer.uniformBindIndexCounter = 0;
+  renderer.debug = debug;
 
   renderer.destroy = () => {
+    if (debug) console.log("destroying renderer");
     observer.disconnect();
     gl = null;
     currentProgram = null;
@@ -247,13 +250,13 @@ export const createRenderer = (
   };
 
   canvas.addEventListener("webglcontextlost", (event) => {
-    console.log("context lost");
+    if (debug) console.log("context lost");
     event.preventDefault();
     destroyCommandsAndContexts();
     // TODO: prevent rendering until restored
   });
   canvas.addEventListener("webglcontextrestored", () => {
-    console.log("context restoring");
+    if (debug) console.log("context restoring");
     commands.forEach((state) => state.create());
   });
 
@@ -273,21 +276,23 @@ const programCache = new Map();
 const shaderCache = new Map();
 const shaderVersion = "#version 300 es";
 
-export const component = ({
-  context = blankObject,
-  props = blankObject,
-  vertex,
-  fragment,
-  mode = "TRIANGLES",
-  depth = "LESS",
-  cull = "BACK",
-  vertexPrecision = "precision highp float;",
-  fragmentPrecision = "precision highp float;",
-  order = commands.size * 0.001,
-  count: overrideCount,
-  instanceCount: overrideInstanceCount,
-}) => {
-  const state = { order };
+export const component = (input) => {
+  const {
+    context = blankObject,
+    props = blankObject,
+    vertex,
+    fragment,
+    mode = "TRIANGLES",
+    depth = "LESS",
+    cull = "BACK",
+    vertexPrecision = "precision highp float;",
+    fragmentPrecision = "precision highp float;",
+    order = commands.size * 0.001,
+    count: overrideCount,
+    instanceCount: overrideInstanceCount,
+  } = input;
+
+  const state = { order, input };
   let created = false;
 
   if (!vertex || !fragment) {
@@ -374,7 +379,7 @@ export const component = ({
 
   // Lifecycles
   state.create = () => {
-    const { gl, setProgram, setBuffer, setVao, setDepth, setCull } = renderer;
+    const { gl, setProgram, setBuffer, setVao, setDepth, setCull, debug } = renderer;
 
     [...attributes, ...instancedAttributes, ...uniformBlocks, ...textures].forEach((context) => {
       if (!context.created) {
@@ -428,8 +433,7 @@ export const component = ({
       fragment,
     ].join("\n");
 
-    // console.log(finalVertex);
-    // console.log(finalFragment);
+    if (debug) console.log("Creating command", input, finalVertex, finalFragment);
 
     const programKey = finalVertex + finalFragment;
 
@@ -540,6 +544,8 @@ export const component = ({
 
     // Handle instances
     const createInstances = () => {
+      if (debug) console.log("Creating instances", state, instances);
+
       let isFirstBuffer = true;
       offsets.clear();
       for (const { name, refill, dimensions, BatchConstructor } of instancedAttributes) {
@@ -585,6 +591,8 @@ export const component = ({
       if (instanceCount === 0) {
         return;
       }
+
+      if (debug) console.log("Rendering", instanceCount, state);
 
       setProgram(program);
       setVao(vao);
@@ -874,6 +882,8 @@ const createContext = (name, context, isInstanced) => {
         }
         pendingUpdates.clear();
       }
+
+      if (renderer.debug) console.log("Created context piece", context, state);
     };
 
     state.update = (data, x = 0, y = 0, width = 1, height = 1, dataOffset) => {
