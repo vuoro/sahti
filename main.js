@@ -292,8 +292,7 @@ export const component = (input) => {
     instanceCount: overrideInstanceCount,
   } = input;
 
-  const state = { order, input };
-  let created = false;
+  const state = { order, input, created: false };
 
   if (!vertex || !fragment) {
     throw new Error("missing vertex or fragment shader");
@@ -369,7 +368,7 @@ export const component = (input) => {
   };
 
   state.updateInstance = (instance, name, value) => {
-    if (created) {
+    if (state.created) {
       instancedBufferUpdaters.get(name)(value, offsets.get(instance));
       requestRendering();
     } else {
@@ -381,9 +380,9 @@ export const component = (input) => {
   state.create = () => {
     const { gl, setProgram, setBuffer, setVao, setDepth, setCull, debug } = renderer;
 
-    [...attributes, ...instancedAttributes, ...uniformBlocks, ...textures].forEach((context) => {
-      if (!context.created) {
-        context.create();
+    [...attributes, ...instancedAttributes, ...uniformBlocks, ...textures].forEach((state) => {
+      if (!state.created) {
+        state.create();
       }
     });
 
@@ -576,7 +575,7 @@ export const component = (input) => {
     const glMode = gl[mode];
 
     state.render = () => {
-      if (!created) {
+      if (!state.created) {
         if (renderer.gl) {
           state.create();
         } else {
@@ -609,12 +608,12 @@ export const component = (input) => {
     }
     pendingInstanceUpdates.clear();
 
-    created = true;
+    state.created = true;
     requestRendering();
   };
 
   state.destroy = () => {
-    created = false;
+    state.created = false;
   };
 
   if (renderer.gl) {
@@ -663,9 +662,8 @@ const createContext = (name, context, isInstanced) => {
     type = "uniformBlock";
   }
 
-  const state = { name, contextType: type };
+  const state = { name, contextType: type, created: false };
 
-  let created = false;
   const pendingUpdates = new Set();
 
   if (isInstanced) {
@@ -702,7 +700,7 @@ const createContext = (name, context, isInstanced) => {
 
       usage = isInstanced ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
-      created = true;
+      state.created = true;
       state.refill(data);
       requestRendering();
 
@@ -713,11 +711,12 @@ const createContext = (name, context, isInstanced) => {
         pendingUpdates.clear();
       }
 
-      if (renderer.debug) console.log("Created context buffer", context, state);
+      if (renderer.debug)
+        console.log(`Created ${isInstanced ? "prop" : "context"} buffer`, context, state);
     };
 
     state.refill = (data) => {
-      if (created) {
+      if (state.created) {
         const { gl, setBuffer } = renderer;
 
         setBuffer(buffer);
@@ -729,7 +728,7 @@ const createContext = (name, context, isInstanced) => {
     };
 
     state.update = (data, dstByteOffset = 0, srcOffset = 0, length) => {
-      if (created) {
+      if (state.created) {
         const { gl, setBuffer } = renderer;
         setBuffer(buffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, dstByteOffset, data, srcOffset, length);
@@ -790,7 +789,7 @@ const createContext = (name, context, isInstanced) => {
 
       gl.bufferData(gl.UNIFORM_BUFFER, allData, gl.DYNAMIC_DRAW);
 
-      created = true;
+      state.created = true;
       requestRendering();
 
       if (pendingUpdates.size) {
@@ -804,7 +803,7 @@ const createContext = (name, context, isInstanced) => {
     };
 
     state.update = (key, data) => {
-      if (created) {
+      if (state.created) {
         const { gl, setBuffer } = renderer;
         setBuffer(buffer, gl.UNIFORM_BUFFER);
         gl.bufferSubData(gl.UNIFORM_BUFFER, offsets.get(key), data, 0, data.length);
@@ -879,7 +878,7 @@ const createContext = (name, context, isInstanced) => {
 
       _TEXTURE_2D = gl.TEXTURE_2D;
 
-      created = true;
+      state.created = true;
       requestRendering();
 
       if (pendingUpdates.size) {
@@ -893,7 +892,7 @@ const createContext = (name, context, isInstanced) => {
     };
 
     state.update = (data, x = 0, y = 0, width = 1, height = 1, dataOffset) => {
-      if (created) {
+      if (state.created) {
         const { gl, setTexture } = renderer;
         setTexture(texture);
 
@@ -920,12 +919,12 @@ const createContext = (name, context, isInstanced) => {
   }
 
   state.destroy = () => {
-    created = false;
+    state.created = false;
   };
 
   contexts.set(isInstanced ? "instancedBuffer-" + instancedBufferCounter++ : context, state);
 
-  if (context.gl) {
+  if (context.gl && !state.ted) {
     state.create();
   }
 
