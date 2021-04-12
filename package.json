@@ -1,6 +1,6 @@
 {
   "name": "@vuoro/sahti",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Write a WebGL 2 command, use it like a component.",
   "type": "module",
   "main": "main.js",
@@ -13,8 +13,8 @@
     "start": "npx @web/dev-server --open --watch"
   },
   "peerDependencies": {
-    "react": ">= 16",
-    "react-dom": ">= 16"
+    "react": "*",
+    "react-dom": "*"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
