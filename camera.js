@@ -1,4 +1,4 @@
-import { create, perspective, ortho, lookAt } from "gl-mat4-esm";
+import { create, perspective, ortho, lookAt, multiply, invert } from "gl-mat4-esm";
 import { getContext, resizeSubscribers, requestJob } from "./main.js";
 
 const createCamera = (props = {}) => {
@@ -8,6 +8,8 @@ const createCamera = (props = {}) => {
     includeTarget = false,
     includeDirection = false,
     includeUp = false,
+    includeProjectionView = false,
+    includeInverseProjectionView = false,
   } = props;
 
   let width = window.innerWidth;
@@ -16,6 +18,8 @@ const createCamera = (props = {}) => {
 
   const projection = create();
   const view = create();
+  const projectionView = create();
+  const inverseProjectionView = create();
   const position = Float32Array.from(props.position || [0, 0, 1]);
   const target = Float32Array.from(props.target || [0, 0, 0]);
   const up = Float32Array.from(props.up || [0, 1, 0]);
@@ -44,6 +48,8 @@ const createCamera = (props = {}) => {
   if (includeTarget) context.cameraTarget = target;
   if (includeUp) context.cameraUp = up;
   if (includeDirection) context.cameraDirection = direction;
+  if (includeProjectionView) context.projectionView = projectionView;
+  if (includeInverseProjectionView) context.inverseProjectionView = inverseProjectionView;
 
   const { update: updateContext } = getContext(context);
 
@@ -83,9 +89,18 @@ const createCamera = (props = {}) => {
     updateContext("view", view);
   };
 
+  const updateCombined = () => {
+    multiply(projectionView, projection, view);
+    invert(inverseProjectionView, projectionView);
+
+    if (includeProjectionView) updateContext("projectionView", projectionView);
+    if (includeInverseProjectionView) updateContext("inverseProjectionView", inverseProjectionView);
+  };
+
   const update = () => {
     if (projectionNeedsUpdate) requestJob(updateProjection);
     requestJob(updateView);
+    requestJob(updateCombined);
   };
 
   update();
@@ -99,6 +114,8 @@ const createCamera = (props = {}) => {
   const camera = {
     projection,
     view,
+    projectionView,
+    inverseProjectionView,
     position,
     target,
     up,
