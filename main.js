@@ -756,47 +756,50 @@ const createContext = (name, context, isInstanced) => {
       let byteCounter = 0;
       let elementCounter = 0;
 
-      const uniforms = Object.entries(context)
-        .sort(([, valueA], [, valueB]) => (valueB.length || 1) - (valueA.length || 1))
-        .map(([name, value], index) => {
-          const [, shaderType] = dataToTypes(value);
-          const elementCount = value.length || 1;
+      const uniforms = Object.entries(context).map(([name, value], index) => {
+        const [, shaderType] = dataToTypes(value);
+        const elementCount = value.length || 1;
 
-          // std140 alignment rules
-          const size =
-            elementCount === 1 ? 1 : elementCount === 2 ? 2 : Math.ceil(elementCount / 4) * 4;
+        // std140 alignment rules
+        const [alignment, size] =
+          elementCount === 1 ? [1, 1] : elementCount === 2 ? [2, 2] : [4, elementCount];
 
-          // std140 alignment padding
-          // | a |...|...|...|b.x|b.y|b.z|b.w| c | d |...|...|
-          const distanceFromAlignment = elementCounter % size;
-          const padding = distanceFromAlignment ? size - distanceFromAlignment : 0;
-          elementCounter += padding;
-          byteCounter += padding * 4;
+        // std140 alignment padding
+        // | a |...|...|...|b.x|b.y|b.z|b.w| c | d |...|...|
+        const padding = (alignment - (elementCounter % alignment)) % alignment;
+        elementCounter += padding;
+        byteCounter += padding * 4;
 
-          let data;
-          if (Array.isArray(value) || ArrayBuffer.isView(value)) {
-            data = value;
-          } else {
-            data = [value];
-          }
+        let data;
+        if (Array.isArray(value) || ArrayBuffer.isView(value)) {
+          data = value;
+        } else {
+          data = [value];
+        }
 
-          const uniform = {
-            shaderType,
-            byteOffset: byteCounter,
-            elementOffset: elementCounter,
-            data,
-          };
-          state.uniforms[name] = uniform;
+        const uniform = {
+          shaderType,
+          padding,
+          size,
+          byteOffset: byteCounter,
+          elementOffset: elementCounter,
+          data,
+        };
 
-          offsets.set(name, uniform.byteOffset);
+        state.uniforms[name] = uniform;
+        offsets.set(name, uniform.byteOffset);
 
-          elementCounter += size;
-          byteCounter += size * 4;
+        elementCounter += size;
+        byteCounter += size * 4;
 
-          return uniform;
-        });
+        return uniform;
+      });
 
-      const allData = new Float32Array(elementCounter + (elementCounter % 4));
+      const endPadding = (4 - (elementCounter % 4)) % 4;
+      elementCounter += endPadding;
+
+      const allData = new Float32Array(elementCounter);
+      state.allData = allData;
 
       uniforms.forEach(({ data, elementOffset }) => allData.set(data, elementOffset));
 
