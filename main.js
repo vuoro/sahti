@@ -756,34 +756,47 @@ const createContext = (name, context, isInstanced) => {
       let byteCounter = 0;
       let elementCounter = 0;
 
-      const uniforms = Object.entries(context).map(([name, value], index) => {
-        const [, shaderType] = dataToTypes(value);
-        const size = Math.max(4, value.length || 4);
+      const uniforms = Object.entries(context)
+        .sort(([, valueA], [, valueB]) => (valueB.length || 1) - (valueA.length || 1))
+        .map(([name, value], index) => {
+          const [, shaderType] = dataToTypes(value);
+          const elementCount = value.length || 1;
 
-        let data;
-        if (Array.isArray(value) || ArrayBuffer.isView(value)) {
-          data = value;
-        } else {
-          data = [value];
-        }
+          // std140 alignment rules
+          const size =
+            elementCount === 1 ? 1 : elementCount === 2 ? 2 : Math.ceil(elementCount / 4) * 4;
 
-        const uniform = {
-          shaderType,
-          byteOffset: byteCounter,
-          elementOffset: elementCounter,
-          data,
-        };
-        state.uniforms[name] = uniform;
+          // std140 alignment padding
+          // | a |...|...|...|b.x|b.y|b.z|b.w| c | d |...|...|
+          const distanceFromAlignment = elementCounter % size;
+          const padding = distanceFromAlignment ? size - distanceFromAlignment : 0;
+          elementCounter += padding;
+          byteCounter += padding * 4;
 
-        offsets.set(name, byteCounter);
+          let data;
+          if (Array.isArray(value) || ArrayBuffer.isView(value)) {
+            data = value;
+          } else {
+            data = [value];
+          }
 
-        elementCounter += size;
-        byteCounter += size * 4;
+          const uniform = {
+            shaderType,
+            byteOffset: byteCounter,
+            elementOffset: elementCounter,
+            data,
+          };
+          state.uniforms[name] = uniform;
 
-        return uniform;
-      });
+          offsets.set(name, uniform.byteOffset);
 
-      const allData = new Float32Array(elementCounter);
+          elementCounter += size;
+          byteCounter += size * 4;
+
+          return uniform;
+        });
+
+      const allData = new Float32Array(elementCounter + (elementCounter % 4));
 
       uniforms.forEach(({ data, elementOffset }) => allData.set(data, elementOffset));
 
