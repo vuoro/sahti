@@ -1,6 +1,6 @@
 {
   "name": "@vuoro/sahti",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Write a WebGL 2 command, use it like a component.",
   "type": "module",
   "main": "main.js",
