@@ -628,7 +628,7 @@ export const component = (input) => {
 };
 
 const sortCommands = () => {
-  const list = [...commands].sort(([, a], [, b]) => b.order - a.order);
+  const list = [...commands].sort(([, a], [, b]) => a.order - b.order);
   commands.clear();
   list.forEach(([key, value]) => commands.set(key, value));
 };
