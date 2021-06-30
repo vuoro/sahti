@@ -8,6 +8,8 @@ const createCamera = (props = {}) => {
     includeTarget = false,
     includeDirection = false,
     includeUp = false,
+    includeProjection = true,
+    includeView = true,
     includeProjectionView = false,
     includeInverseProjectionView = false,
   } = props;
@@ -39,15 +41,13 @@ const createCamera = (props = {}) => {
     direction[2] /= magnitude;
   };
 
-  const context = {
-    projection,
-    view,
-  };
-
+  const context = {};
   if (includePosition) context.cameraPosition = position;
   if (includeTarget) context.cameraTarget = target;
   if (includeUp) context.cameraUp = up;
   if (includeDirection) context.cameraDirection = direction;
+  if (includeProjection) context.projection = projection;
+  if (includeView) context.view = view;
   if (includeProjectionView) context.projectionView = projectionView;
   if (includeInverseProjectionView) context.inverseProjectionView = inverseProjectionView;
 
@@ -71,7 +71,7 @@ const createCamera = (props = {}) => {
       ortho(projection, left, right, bottom, top, near, far);
     }
 
-    updateContext("projection", projection);
+    if (includeProjection) updateContext("projection", projection);
   };
 
   const updateView = () => {
@@ -86,7 +86,7 @@ const createCamera = (props = {}) => {
       updateContext("cameraDirection", direction);
     }
 
-    updateContext("view", view);
+    if (includeView) updateContext("view", view);
   };
 
   const updateCombined = () => {
@@ -109,6 +109,7 @@ const createCamera = (props = {}) => {
     width = drawingBufferWidth;
     height = drawingBufferHeight;
     requestJob(updateProjection);
+    requestJob(updateCombined);
   });
 
   const camera = {
