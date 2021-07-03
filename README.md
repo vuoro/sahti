@@ -314,3 +314,9 @@ Sahti uses a `ResizeObserver` to respond to `<canvas>` dimension changes. Due to
 import { useAnimationFrame } from "@vuoro/sahti";
 import { useAnimationFrame } from "@vuoro/sahti/react";
 ```
+
+
+## Contributors
+
+- https://twitter.com/jonikorpi/
+- https://twitter.com/VirtanenS (library name)
