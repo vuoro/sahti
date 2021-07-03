@@ -742,6 +742,8 @@ const createContext = (name, context, isInstanced) => {
     let buffer;
     state.uniforms = {};
     const offsets = new Map();
+    let firstDirty = Infinity;
+    let lastDirty = 0;
 
     state.create = () => {
       const { gl, setBuffer } = renderer;
@@ -787,7 +789,7 @@ const createContext = (name, context, isInstanced) => {
         };
 
         state.uniforms[name] = uniform;
-        offsets.set(name, uniform.byteOffset);
+        offsets.set(name, uniform.elementOffset);
 
         elementCounter += size;
         byteCounter += size * 4;
@@ -820,13 +822,42 @@ const createContext = (name, context, isInstanced) => {
 
     state.update = (key, data) => {
       if (state.created) {
-        const { gl, setBuffer } = renderer;
-        setBuffer(buffer, gl.UNIFORM_BUFFER);
-        gl.bufferSubData(gl.UNIFORM_BUFFER, offsets.get(key), data, 0, data.length);
+        const length = data.length || 1;
+        const offset = offsets.get(key);
+
+        firstDirty = Math.min(offset, firstDirty);
+        lastDirty = Math.max(offset + length, lastDirty);
+
+        if (data.length) {
+          state.allData.set(data, offset);
+        } else {
+          state.allData[offset] = data;
+        }
+
+        requestJob(state.commitUpdate);
       } else {
         pendingUpdates.add([key, data]);
       }
+
       requestRendering();
+    };
+
+    state.commitUpdate = () => {
+      if (renderer.debug)
+        console.log("Updating uniform block", state.name, state.allData, firstDirty, lastDirty);
+
+      const { gl, setBuffer } = renderer;
+      setBuffer(buffer, gl.UNIFORM_BUFFER);
+      gl.bufferSubData(
+        gl.UNIFORM_BUFFER,
+        firstDirty * state.allData.BYTES_PER_ELEMENT,
+        state.allData,
+        firstDirty,
+        lastDirty - firstDirty
+      );
+
+      firstDirty = Infinity;
+      lastDirty = 0;
     };
   } else if (type === "texture") {
     // Texture
