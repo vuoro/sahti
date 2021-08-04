@@ -9,7 +9,7 @@ let totalSubscribers = 0;
 let frame = null;
 const now = new Date();
 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-const { navigationStart } = performance.timing;
+const navigationStart = performance?.timing?.navigationStart || 0;
 const timeOffset = navigationStart - startOfMonth.valueOf();
 
 export const subscribeToAnimationFrame = (callback, nthFrame) => {
