@@ -14,8 +14,8 @@ const createCamera = (props = {}) => {
     includeInverseProjectionView = false,
   } = props;
 
-  let width = window.innerWidth;
-  let height = window.innerHeight;
+  let width = window?.innerWidth || 1;
+  let height = window?.innerHeight || 1;
   let projectionNeedsUpdate = true;
 
   const projection = create();
