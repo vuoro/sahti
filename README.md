@@ -17,6 +17,7 @@ https://www.npmjs.com/package/@vuoro/sahti
 ## Supported frameworks
 
 - [x] React `import {component, Canvas} from "@vuoro/sahti/react";`
+- [x] Preact `import {component, Canvas} from "@vuoro/sahti/preact";`
 - [x] Custom `import {component, createRenderer} from "@vuoro/sahti";`
 - [ ] Web Components (soon, hopefully)
 
@@ -62,6 +63,10 @@ const App = () => (
 ## Maximal React example
 
 Demo and source: https://vuoro.github.io/sahti/examples/maximal.react.html
+
+## Minimal Preact example
+
+Demo and source: https://vuoro.github.io/sahti/examples/minimal.preact.html
 
 ## API and usage
 
@@ -314,7 +319,6 @@ Sahti uses a `ResizeObserver` to respond to `<canvas>` dimension changes. Due to
 import { useAnimationFrame } from "@vuoro/sahti";
 import { useAnimationFrame } from "@vuoro/sahti/react";
 ```
-
 
 ## Contributors
 

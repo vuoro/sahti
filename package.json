@@ -14,7 +14,8 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "preact": "*"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
