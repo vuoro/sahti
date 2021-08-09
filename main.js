@@ -97,7 +97,7 @@ const requestRendering = () => {
 export const createRenderer = (
   canvas,
   attributes = blankObject,
-  pixelRatio = typeof window ? window.devicePixelRatio : 1,
+  pixelRatio = 1,
   debug = false
 ) => {
   let gl = canvas.getContext("webgl2", { ...defaultAttributes, ...attributes });
@@ -197,12 +197,13 @@ export const createRenderer = (
   const observer = new ResizeObserver((entries) => {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
-      canvas.width = width * pixelRatio;
-      canvas.height = height * pixelRatio;
+      const ratio = window.devicePixelRatio * pixelRatio;
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
       for (const subscriber of resizeSubscribers) {
-        subscriber(0, 0, width, height, pixelRatio);
+        subscriber(0, 0, width, height, ratio);
       }
 
       requestRendering();
