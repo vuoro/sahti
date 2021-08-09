@@ -276,6 +276,7 @@ export const commands = new Map();
 const programCache = new Map();
 const shaderCache = new Map();
 const shaderVersion = "#version 300 es";
+const defaultShouldRender = () => true;
 
 export const component = (input) => {
   const {
@@ -291,6 +292,7 @@ export const component = (input) => {
     order = commands.size * 0.001,
     count: overrideCount,
     instanceCount: overrideInstanceCount,
+    shouldRender = defaultShouldRender,
   } = input;
 
   const state = { order, input, created: false };
@@ -576,6 +578,8 @@ export const component = (input) => {
     const glMode = gl[mode];
 
     state.render = () => {
+      if (!shouldRender()) return;
+      
       if (!state.created) {
         if (renderer.gl) {
           state.create();
