@@ -2,20 +2,26 @@ import { create, perspective, ortho, lookAt, multiply, invert } from "gl-mat4-es
 import { getContext, resizeSubscribers, requestJob } from "./main.js";
 
 const createCamera = (props = {}) => {
-  let { fov, near = 0.1, far = 1000, zoom = 1 } = props;
+  let { fov, near = 0.1, far = 1000, zoom = 1, include = {} } = props;
   const {
-    includePosition = false,
-    includeTarget = false,
-    includeDirection = false,
-    includeUp = false,
-    includeProjection = true,
-    includeView = true,
-    includeProjectionView = false,
-    includeInverseProjectionView = false,
-  } = props;
+    position: includePosition = false,
+    target: includeTarget = false,
+    direction: includeDirection = false,
+    up: includeUp = false,
+    near: includeNear = false,
+    far: includeFar = false,
+    zoom: includeZoom = false,
+    fov: includeFov = false,
+    projection: includeProjection = true,
+    view: includeView = true,
+    projectionView: includeProjectionView = false,
+    inverseProjectionView: includeInverseProjectionView = false,
+    devicePixelRatio: includeDevicePixelRatio = false,
+  } = include;
 
   let width = window?.innerWidth || 1;
   let height = window?.innerHeight || 1;
+  let devicePixelRatio = window.devicePixelRatio;
   let projectionNeedsUpdate = true;
 
   const projection = create();
@@ -44,12 +50,17 @@ const createCamera = (props = {}) => {
   const context = {};
   if (includePosition) context.cameraPosition = position;
   if (includeTarget) context.cameraTarget = target;
-  if (includeUp) context.cameraUp = up;
   if (includeDirection) context.cameraDirection = direction;
+  if (includeUp) context.cameraUp = up;
+  if (includeNear) context.cameraNear = near;
+  if (includeFar) context.cameraFar = far;
+  if (includeZoom) context.cameraZoom = zoom;
+  if (includeFov) context.cameraFov = fov;
   if (includeProjection) context.projection = projection;
   if (includeView) context.view = view;
   if (includeProjectionView) context.projectionView = projectionView;
   if (includeInverseProjectionView) context.inverseProjectionView = inverseProjectionView;
+  if (includeDevicePixelRatio) context.devicePixelRatio = devicePixelRatio;
 
   const { update: updateContext } = getContext(context);
 
@@ -72,6 +83,10 @@ const createCamera = (props = {}) => {
     }
 
     if (includeProjection) updateContext("projection", projection);
+    if (includeNear) updateContext("cameraNear", near);
+    if (includeFar) updateContext("cameraFar", far);
+    if (includeZoom) updateContext("cameraZoom", zoom);
+    if (includeFov) updateContext("cameraFov", fov);
   };
 
   const updateView = () => {
@@ -103,13 +118,23 @@ const createCamera = (props = {}) => {
     requestJob(updateCombined);
   };
 
+  const updateDevicePixelRatio = () => {
+    updateContext("devicePixelRatio", devicePixelRatio);
+  };
+
   update();
 
-  resizeSubscribers.add((x, y, drawingBufferWidth, drawingBufferHeight) => {
+  resizeSubscribers.add((x, y, drawingBufferWidth, drawingBufferHeight, ratio) => {
     width = drawingBufferWidth;
     height = drawingBufferHeight;
+
     requestJob(updateProjection);
     requestJob(updateCombined);
+
+    if (includeDevicePixelRatio && ratio !== devicePixelRatio) {
+      devicePixelRatio = ratio;
+      requestJob(updateDevicePixelRatio);
+    }
   });
 
   const camera = {
