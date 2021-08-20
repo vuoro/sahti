@@ -94,12 +94,7 @@ const requestRendering = () => {
   }
 };
 
-export const createRenderer = (
-  canvas,
-  attributes = blankObject,
-  pixelRatio = 1,
-  debug = false
-) => {
+export const createRenderer = (canvas, attributes = blankObject, pixelRatio = 1, debug = false) => {
   let gl = canvas.getContext("webgl2", { ...defaultAttributes, ...attributes });
 
   // Caches and setters
@@ -295,7 +290,7 @@ export const component = (input) => {
     shouldRender = defaultShouldRender,
   } = input;
 
-  const state = { order, input, created: false };
+  const state = { order, input, created: false, count: overrideCount || 0 };
 
   if (!vertex || !fragment) {
     throw new Error("missing vertex or fragment shader");
@@ -380,13 +375,20 @@ export const component = (input) => {
   };
 
   // Lifecycles
+  state.countVertices = () => {
+    state.count = overrideCount
+      ? overrideCount
+      : attributes.reduce((count, context) => Math.min(count, context.count), Infinity);
+  };
+
   state.create = () => {
     const { gl, setProgram, setBuffer, setVao, setDepth, setCull, debug } = renderer;
 
-    [...attributes, ...instancedAttributes, ...uniformBlocks, ...textures].forEach((state) => {
-      if (!state.created) {
-        state.create();
+    [...attributes, ...instancedAttributes, ...uniformBlocks, ...textures].forEach((resource) => {
+      if (!resource.created) {
+        resource.create();
       }
+      resource.bindTo(state);
     });
 
     const attributeLines = attributes
@@ -505,9 +507,7 @@ export const component = (input) => {
     setVao();
 
     // Count vertices
-    const count = attributes.length
-      ? attributes.reduce((count, context) => Math.min(count, context.count), Infinity)
-      : overrideCount;
+    state.countVertices();
 
     // Prepare uniform blocks
     for (let i = gl.getProgramParameter(program, gl.ACTIVE_UNIFORM_BLOCKS) - 1; i >= 0; i--) {
@@ -579,7 +579,7 @@ export const component = (input) => {
 
     state.render = () => {
       if (!shouldRender()) return;
-      
+
       if (!state.created) {
         if (renderer.gl) {
           state.create();
@@ -603,7 +603,7 @@ export const component = (input) => {
       setDepth(depth);
       setCull(cull);
 
-      gl.drawArraysInstanced(glMode, 0, count, instanceCount);
+      gl.drawArraysInstanced(glMode, 0, state.count, instanceCount);
 
       setVao();
     };
@@ -670,6 +670,9 @@ const createContext = (name, context, isInstanced) => {
   const state = { name, contextType: type, created: false };
 
   const pendingUpdates = new Set();
+  const boundComponents = new Set();
+
+  state.bindTo = (component) => boundComponents.add(component);
 
   if (isInstanced) {
     state.defaultValue = context;
@@ -723,6 +726,11 @@ const createContext = (name, context, isInstanced) => {
     state.refill = (data) => {
       if (state.created) {
         const { gl, setBuffer } = renderer;
+
+        state.count = data.length / state.dimensions;
+        for (const component of boundComponents) {
+          requestJob(component.countVertices);
+        }
 
         setBuffer(buffer);
         gl.bufferData(gl.ARRAY_BUFFER, data, usage);
