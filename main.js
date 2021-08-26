@@ -1000,6 +1000,7 @@ export const getContext = (context) => {
 };
 
 export const render = () => {
+  renderer.clear();
   for (const [, command] of commands) {
     command.render();
   }
