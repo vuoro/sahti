@@ -94,7 +94,10 @@ const requestRendering = () => {
   }
 };
 
-export const createRenderer = (canvas, attributes = blankObject, pixelRatio = 1, debug = false) => {
+export const createRenderer = (
+  canvas,
+  { attributes = blankObject, pixelRatio = 1, debug = false, clearColor = [0, 0, 0, 1] }
+) => {
   let gl = canvas.getContext("webgl2", { ...defaultAttributes, ...attributes });
 
   // Caches and setters
@@ -172,7 +175,6 @@ export const createRenderer = (canvas, attributes = blankObject, pixelRatio = 1,
   };
 
   // Clearing
-  let clearColor = [0, 0, 0, 1];
   let lastDepth = 1;
   const setClear = (color = clearColor, depth = lastDepth) => {
     color.forEach((value, index) => {
