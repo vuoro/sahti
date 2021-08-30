@@ -143,6 +143,7 @@ const createCamera = (props = {}) => {
     projectionView,
     inverseProjectionView,
     position,
+    direction,
     target,
     up,
     update,
