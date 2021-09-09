@@ -1021,6 +1021,10 @@ const dataToTypes = (data) => {
   if (Array.isArray(data)) {
     return ["FLOAT", data.length > 4 ? `mat${Math.sqrt(data.length)}` : `vec${data.length}`];
   }
+  
+  if (data.sampler) {
+    return [null, data.sampler];
+  }
 
   switch (data.constructor.name) {
     case "Float32Array":
