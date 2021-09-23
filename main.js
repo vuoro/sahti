@@ -1009,7 +1009,7 @@ const createContext = (
 
   contexts.set(isInstanced ? "instancedBuffer-" + instancedBufferCounter++ : context, state);
 
-  if (context.gl && !state.ted) {
+  if (context.gl && !state.created) {
     state.create();
   }
 
