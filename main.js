@@ -785,7 +785,7 @@ const createContext = (
 
         requestJob(state.commitUpdate);
       } else {
-        pendingUpdates.add([data, offset]);
+        pendingUpdates.add([true, [data, offset]]);
       }
     };
 
@@ -931,7 +931,7 @@ const createContext = (
     // Texture
     let texture;
     let _TEXTURE_2D;
-    let _level, _format, _type;
+    let _level, _format, _internalFormat, _type;
 
     state.create = () => {
       const { gl, setTexture } = renderer;
@@ -962,6 +962,7 @@ const createContext = (
       state.shaderType = sampler;
       _level = level;
       _format = gl[format];
+      _internalFormat = gl[internalFormat];
       _type = gl[type];
 
       const parameters = {
@@ -978,7 +979,7 @@ const createContext = (
         gl.texImage2D(
           gl.TEXTURE_2D,
           level,
-          gl[internalFormat],
+          _internalFormat,
           width,
           height,
           border,
@@ -988,7 +989,7 @@ const createContext = (
           offset
         );
       } else {
-        gl.texImage2D(gl.TEXTURE_2D, level, gl[internalFormat], _format, _type, state.allData);
+        gl.texImage2D(gl.TEXTURE_2D, level, _internalFormat, _format, _type, state.allData);
       }
 
       _TEXTURE_2D = gl.TEXTURE_2D;
@@ -997,13 +998,27 @@ const createContext = (
       requestRendering();
 
       if (pendingUpdates.size) {
-        for (const update of pendingUpdates) {
-          state.update(...update);
+        for (const [isRefill, update] of pendingUpdates) {
+          state[isRefill ? "refill" : "update"](...update);
         }
         pendingUpdates.clear();
       }
 
       if (renderer.debug) console.log("Created context texture", context, state);
+    };
+
+    state.refill = (data) => {
+      if (state.created) {
+        const { gl, setTexture } = renderer;
+
+        state.allData = data;
+
+        setTexture(texture);
+        gl.texImage2D(gl.TEXTURE_2D, _level, _internalFormat, _format, _type, state.allData);
+        requestRendering();
+      } else {
+        pendingUpdates.add([true, [data]]);
+      }
     };
 
     state.update = (data, x = 0, y = 0, width = 1, height = 1, dataOffset) => {
@@ -1024,7 +1039,7 @@ const createContext = (
           dataOffset
         );
       } else {
-        pendingUpdates.add([data, x, y, width, height, dataOffset]);
+        pendingUpdates.add([false, [data, x, y, width, height, dataOffset]]);
       }
 
       requestRendering();
