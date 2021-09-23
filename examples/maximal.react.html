@@ -62,11 +62,10 @@
       const square = [
         [-size, -size, 0],
         [size, -size, 0],
-        [-size, size, 0],
-        [size, -size, 0],
         [size, size, 0],
         [-size, size, 0],
       ];
+      const elements = [0, 1, 2, 2, 3, 0];
 
       // A texture to cover the squares
       const textureSize = 32;
@@ -84,6 +83,7 @@
       // ====================
       const WhiteSquare = component({
         context: { square, camera, surface },
+        elements,
         props: { position: [0, 0, 0] },
         vertex: `
           out vec2 textureCoordinates;

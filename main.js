@@ -278,6 +278,7 @@ const defaultShouldRender = () => true;
 export const component = (input) => {
   const {
     context = blankObject,
+    elements,
     props = blankObject,
     vertex,
     fragment,
@@ -303,6 +304,7 @@ export const component = (input) => {
     instancedAttributes = [],
     uniformBlocks = [],
     textures = [];
+  let elementsContext;
 
   for (const name in context) {
     const contextResource = context[name];
@@ -330,7 +332,7 @@ export const component = (input) => {
 
   for (const name in props) {
     const context = props[name];
-    instancedAttributes.push(createContext(name, context, true));
+    instancedAttributes.push(createContext(name, context, { isInstanced: true }));
   }
 
   // Kick off instances
@@ -483,6 +485,14 @@ export const component = (input) => {
     const vao = gl.createVertexArray();
     setVao(vao);
 
+    // Prepare elements
+    if (elements) {
+      elementsContext = createContext("ELEMENTS", elements, {
+        BUFFER_BINDING: "ELEMENT_ARRAY_BUFFER",
+      });
+      elementsContext.create();
+    }
+
     // Prepare attributes
     for (let i = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES) - 1; i >= 0; i--) {
       const { name } = gl.getActiveAttrib(program, i);
@@ -490,14 +500,13 @@ export const component = (input) => {
       const context =
         attributes.find((state) => name === state.name) ||
         instancedAttributes.find((state) => name === state.name);
-      const isInstanced = context.contextType === "instancedBuffer";
 
       if (location === -1 || !context.buffer) {
         console.warn(`Failed ${name}`);
         continue;
       }
 
-      if (isInstanced) {
+      if (context.contextType === "instancedBuffer") {
         gl.vertexAttribDivisor(location, 1);
       }
 
@@ -578,6 +587,8 @@ export const component = (input) => {
 
     // Prepare for rendering
     const glMode = gl[mode];
+    const glUnsignedShort = gl.UNSIGNED_SHORT;
+    const elementsLength = elements ? elements.length : 0;
 
     state.render = () => {
       if (!shouldRender()) return;
@@ -605,7 +616,11 @@ export const component = (input) => {
       setDepth(depth);
       setCull(cull);
 
-      gl.drawArraysInstanced(glMode, 0, state.count, instanceCount);
+      if (elementsContext) {
+        gl.drawElementsInstanced(glMode, elementsLength, glUnsignedShort, 0, instanceCount);
+      } else {
+        gl.drawArraysInstanced(glMode, 0, state.count, instanceCount);
+      }
 
       setVao();
     };
@@ -642,7 +657,13 @@ const sortCommands = () => {
 
 let instancedBufferCounter = 0;
 
-const createContext = (name, context, isInstanced) => {
+const createContext = (
+  name,
+  context,
+  { isInstanced = false, BUFFER_BINDING = "ARRAY_BUFFER" } = blankObject
+) => {
+  const isElements = BUFFER_BINDING === "ELEMENT_ARRAY_BUFFER";
+
   if (!isInstanced && contexts.has(context)) {
     const result = getContext(context);
 
@@ -684,7 +705,9 @@ const createContext = (name, context, isInstanced) => {
     // buffer
     let buffer, usage;
 
-    const [bufferType, shaderType] = dataToTypes(isInstanced ? context : context[0]);
+    const [bufferType, shaderType] = isElements
+      ? ["UNSIGNED_SHORT", "int"]
+      : dataToTypes(isInstanced ? context : context[0]);
     state.bufferType = bufferType;
     state.shaderType = shaderType;
     state.dimensions = (isInstanced ? context : context[0]).length || 1;
@@ -694,7 +717,7 @@ const createContext = (name, context, isInstanced) => {
       const { gl, setBuffer } = renderer;
       buffer = gl.createBuffer();
       state.buffer = buffer;
-      setBuffer(buffer);
+      setBuffer(buffer, gl[BUFFER_BINDING]);
 
       const data = new state.BatchConstructor(
         isInstanced
@@ -734,8 +757,8 @@ const createContext = (name, context, isInstanced) => {
           requestJob(component.countVertices);
         }
 
-        setBuffer(buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, data, usage);
+        setBuffer(buffer, gl[BUFFER_BINDING]);
+        gl.bufferData(gl[BUFFER_BINDING], data, usage);
         requestRendering();
       } else {
         pendingUpdates.add([true, [data]]);
@@ -745,8 +768,8 @@ const createContext = (name, context, isInstanced) => {
     state.update = (data, dstByteOffset = 0, srcOffset = 0, length) => {
       if (state.created) {
         const { gl, setBuffer } = renderer;
-        setBuffer(buffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER, dstByteOffset, data, srcOffset, length);
+        setBuffer(buffer, gl[BUFFER_BINDING]);
+        gl.bufferSubData(gl[BUFFER_BINDING], dstByteOffset, data, srcOffset, length);
       } else {
         pendingUpdates.add([false, [data, dstByteOffset, srcOffset, length]]);
       }
