@@ -701,6 +701,9 @@ const createContext = (
     state.defaultValue = context;
   }
 
+  let firstDirty = Infinity;
+  let lastDirty = 0;
+
   if (type === "buffer" || isInstanced) {
     // buffer
     let buffer, usage;
@@ -753,6 +756,8 @@ const createContext = (
         const { gl, setBuffer } = renderer;
 
         state.count = data.length / state.dimensions;
+        state.allData = data;
+
         for (const component of boundComponents) {
           requestJob(component.countVertices);
         }
@@ -765,14 +770,42 @@ const createContext = (
       }
     };
 
-    state.update = (data, dstByteOffset = 0, srcOffset = 0, length) => {
+    state.update = (data, offset = 0) => {
       if (state.created) {
-        const { gl, setBuffer } = renderer;
-        setBuffer(buffer, gl[BUFFER_BINDING]);
-        gl.bufferSubData(gl[BUFFER_BINDING], dstByteOffset, data, srcOffset, length);
+        const length = data.length;
+
+        firstDirty = Math.min(offset, firstDirty);
+        lastDirty = Math.max(offset + length, lastDirty);
+
+        if (length) {
+          state.allData.set(data, offset);
+        } else {
+          state.allData[offset] = data;
+        }
+
+        requestJob(state.commitUpdate);
       } else {
-        pendingUpdates.add([false, [data, dstByteOffset, srcOffset, length]]);
+        pendingUpdates.add([data, offset]);
       }
+    };
+
+    state.commitUpdate = () => {
+      if (renderer.debug)
+        console.log("Updating buffer", state.name, state.allData, firstDirty, lastDirty);
+
+      const { gl, setBuffer } = renderer;
+      setBuffer(buffer, gl[BUFFER_BINDING]);
+      gl.bufferSubData(
+        gl[BUFFER_BINDING],
+        firstDirty * state.allData.BYTES_PER_ELEMENT,
+        state.allData,
+        firstDirty,
+        lastDirty - firstDirty
+      );
+
+      firstDirty = Infinity;
+      lastDirty = 0;
+
       requestRendering();
     };
   } else if (type === "uniformBlock") {
@@ -780,8 +813,6 @@ const createContext = (
     let buffer;
     state.uniforms = {};
     const offsets = new Map();
-    let firstDirty = Infinity;
-    let lastDirty = 0;
 
     state.create = () => {
       const { gl, setBuffer } = renderer;
@@ -838,12 +869,11 @@ const createContext = (
       const endPadding = (4 - (elementCounter % 4)) % 4;
       elementCounter += endPadding;
 
-      const allData = new Float32Array(elementCounter);
-      state.allData = allData;
+      state.allData = new Float32Array(elementCounter);
 
-      uniforms.forEach(({ data, elementOffset }) => allData.set(data, elementOffset));
+      uniforms.forEach(({ data, elementOffset }) => state.allData.set(data, elementOffset));
 
-      gl.bufferData(gl.UNIFORM_BUFFER, allData, gl.DYNAMIC_DRAW);
+      gl.bufferData(gl.UNIFORM_BUFFER, state.allData, gl.DYNAMIC_DRAW);
 
       state.created = true;
       requestRendering();
@@ -876,8 +906,6 @@ const createContext = (
       } else {
         pendingUpdates.add([key, data]);
       }
-
-      requestRendering();
     };
 
     state.commitUpdate = () => {
@@ -896,6 +924,8 @@ const createContext = (
 
       firstDirty = Infinity;
       lastDirty = 0;
+
+      requestRendering();
     };
   } else if (type === "texture") {
     // Texture
@@ -927,7 +957,7 @@ const createContext = (
       const pixelsAreABuffer = !inputPixels || ArrayBuffer.isView(inputPixels);
       const width = pixelsAreABuffer && (inputWidth || 64);
       const height = pixelsAreABuffer && (inputHeight || 64);
-      const pixels = context.pixels || new Float32Array(width * height * channels);
+      state.allData = context.pixels || new Float32Array(width * height * channels);
 
       state.shaderType = sampler;
       _level = level;
@@ -954,11 +984,11 @@ const createContext = (
           border,
           _format,
           _type,
-          pixels,
+          state.allData,
           offset
         );
       } else {
-        gl.texImage2D(gl.TEXTURE_2D, level, gl[internalFormat], _format, _type, pixels);
+        gl.texImage2D(gl.TEXTURE_2D, level, gl[internalFormat], _format, _type, state.allData);
       }
 
       _TEXTURE_2D = gl.TEXTURE_2D;
