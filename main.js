@@ -957,7 +957,7 @@ const createContext = (
       const pixelsAreABuffer = !inputPixels || ArrayBuffer.isView(inputPixels);
       const width = pixelsAreABuffer && (inputWidth || 64);
       const height = pixelsAreABuffer && (inputHeight || 64);
-      state.allData = context.pixels || new Float32Array(width * height * channels);
+      state.allData = context.pixels || null;
 
       state.shaderType = sampler;
       _level = level;
