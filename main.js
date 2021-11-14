@@ -193,8 +193,12 @@ export const createRenderer = (
 
   const observer = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      const { width, height } = entry.contentRect;
-      const ratio = window.devicePixelRatio * pixelRatio;
+      const size = entry.devicePixelContentBoxSize || entry.contentBoxSize || entry.contentRect;
+      const isDeviceSize = "devicePixelContentBoxSize" in entry;
+      const isFallback = size === entry.contentRect;
+      const width = isFallback ? size.width : size[0].inlineSize;
+      const height = isFallback ? size.height : size[0].blockSize;
+      const ratio = (isDeviceSize ? 1 : window.devicePixelRatio) * pixelRatio;
       canvas.width = width * ratio;
       canvas.height = height * ratio;
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -206,7 +210,7 @@ export const createRenderer = (
       requestRendering();
     }
   });
-  observer.observe(canvas);
+  observer.observe(canvas, {"content-box", "device-pixel-content-box"});
 
   renderer.gl = gl;
   renderer.canvas = canvas;
